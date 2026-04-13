@@ -35,6 +35,24 @@ def lexer(code):
             tokens.append(("EQUAL", "="))
             i += 1
 
+        # 👇 ADICIONE AQUI (OPERADORES)
+        elif char == "+":
+            tokens.append(("PLUS", "+"))
+            i += 1
+
+        elif char == "-":
+            tokens.append(("MINUS", "-"))
+            i += 1
+
+        elif char == "*":
+            tokens.append(("MULT", "*"))
+            i += 1
+
+        elif char == "/":
+            tokens.append(("DIV", "/"))
+            i += 1
+
+        # 👇 CONTINUA NORMAL
         elif char == "(":
             tokens.append(("LPAREN", "("))
             i += 1
