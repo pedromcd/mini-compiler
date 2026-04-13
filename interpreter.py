@@ -1,34 +1,35 @@
+# Dicionário que armazena as variáveis (memória do programa)
 variables = {}
 
 def interpret(tokens):
-    print("DEBUG INTERPRETADOR NOVO")
-def interpret(tokens):
-    # Caso: var x = ...
+    # 🔹 Caso: declaração de variável
+    # Ex: var x = 5 + 3
     if tokens[0][0] == "VAR":
-        name = tokens[1][1]
+        name = tokens[1][1]  # nome da variável
 
-        # pega toda a expressão depois do '='
+        # Pega toda a expressão após o '='
         expression_tokens = tokens[3:]
 
-        # monta a expressão como string
+        # Constrói a expressão como string (ex: "5+3*2")
         expression = ""
         for token in expression_tokens:
             expression += token[1]
 
-        print("Expressão:", expression)  # debug (pode remover depois)
-
         try:
+            # Avalia a expressão
             value = eval(expression)
         except:
             raise Exception("Erro ao avaliar expressão")
 
+        # Armazena o valor na memória
         variables[name] = value
 
-    # Caso: print(x)
+    # 🔹 Caso: impressão
+    # Ex: print(x)
     elif tokens[0][0] == "PRINT":
         name = tokens[2][1]
 
         if name in variables:
-            print(variables[name])
+            print(variables[name])  # imprime valor
         else:
             print("Erro: variável não definida")
