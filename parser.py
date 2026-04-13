@@ -14,6 +14,15 @@ def parser(tokens):
 
         if tokens[i][0] != "NUM":
             raise Exception("Erro: esperado número")
+        i += 1
+
+        # verifica se tem operador
+        if i < len(tokens):
+            if tokens[i][0] in ["PLUS", "MINUS", "MULT", "DIV"]:
+                i += 1
+
+                if i >= len(tokens) or tokens[i][0] != "NUM":
+                    raise Exception("Erro: esperado número após operador")
 
     elif tokens[i][0] == "PRINT":
         i += 1
