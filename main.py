@@ -3,7 +3,18 @@ from parser import parser
 from interpreter import interpret
 
 # Pergunta ao usuário se quer ativar modo debug
-DEBUG = input("Modo debug? (s/n): ").lower() == "s"
+print("=== Configuração Inicial ===")
+while True:
+    escolha = input("Modo debug? (s/n): ").strip().lower()
+
+    if escolha == "s":
+        DEBUG = True
+        break
+    elif escolha == "n":
+        DEBUG = False
+        break
+    else:
+        print("Entrada inválida. Digite apenas 's' ou 'n'.")
 
 while True:
     try:
