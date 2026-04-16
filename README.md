@@ -1,6 +1,6 @@
 # 🧠 Mini Compilador — Linguagens Formais e Autômatos
 
-## 👨‍💻 Autores
+## Autores
 
 - Pedro Marques Correa Domingues  
 - Luiz Guilherme Silva Caride  
@@ -11,7 +11,7 @@
 
 ---
 
-## 📌 Descrição do Problema
+## Descrição do Problema
 
 O projeto implementa um **interpretador de uma linguagem de script minimalista**, capaz de declarar variáveis, realizar operações aritméticas e imprimir resultados. O problema escolhido é o de **reconhecimento e execução de linguagens formais estruturadas**, que é o cenário central de compiladores, interpretadores de configuração, validadores de expressões e DSLs (Domain-Specific Languages).
 
@@ -19,7 +19,7 @@ A escolha desse domínio é diretamente motivada pela disciplina: compiladores s
 
 ---
 
-## 🎯 Justificativa das Teorias Escolhidas
+## Justificativa das Teorias Escolhidas
 
 ### Por que Autômato Finito Determinístico (AFD) no Léxico?
 
@@ -144,7 +144,7 @@ PROGRAMA
 
 ---
 
-## ⚙️ Funcionalidades
+## Funcionalidades
 
 | Recurso | Suportado |
 |--------|-----------|
@@ -160,7 +160,7 @@ PROGRAMA
 
 ---
 
-## 🧩 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 mini-compiler/
@@ -295,7 +295,7 @@ Modo debug? (s/n): s
 
 ---
 
-## 🧠 Conceitos Aplicados
+## Conceitos Aplicados
 
 | Conceito | Onde | Como |
 |---------|------|------|
@@ -308,8 +308,10 @@ Modo debug? (s/n): s
 
 ---
 
-## 🔗 Referências
+## Referências
 
 - SIPSER, Michael. *Introduction to the Theory of Computation*. 3. ed. Cengage, 2012.  
 - AHO, Alfred V. et al. *Compilers: Principles, Techniques, and Tools*. 2. ed. Pearson, 2006.  
 - HOPCROFT, John E.; ULLMAN, Jeffrey D. *Introduction to Automata Theory, Languages, and Computation*. Pearson, 2006.
+
+## Autor
