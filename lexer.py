@@ -1,71 +1,162 @@
+# ============================================================
+# lexer.py — Analisador Léxico baseado em AFD explícito
+# ============================================================
+#
+# O Autômato Finito Determinístico (AFD) é definido formalmente como:
+#   M = (Q, Σ, δ, q0, F)
+#
+#   Q  = {INICIO, NUM, PALAVRA, OP, ERRO}
+#   Σ  = caracteres ASCII imprimíveis
+#   q0 = 'INICIO'
+#   F  = {NUM, PALAVRA, OP}          (estados de aceitação)
+#   δ  = dicionário TRANSITION_TABLE abaixo
+#
+# A cada caractere lido, o autômato consulta δ(estado_atual, tipo_char)
+# e avança para o próximo estado. Ao detectar uma transição de volta a
+# INICIO (fim de lexema), o token acumulado é classificado e emitido.
+# ============================================================
+
+# ------------------------------------------------------------------
+# Classificação de caracteres (categorias do alfabeto de entrada)
+# ------------------------------------------------------------------
+def char_type(c):
+    if c.isdigit():        return 'DIGIT'
+    if c.isalpha():        return 'ALPHA'
+    if c == '_':           return 'ALPHA'   # underscore válido em identificadores
+    if c in '+-*/':        return 'OP'
+    if c == '=':           return 'EQUAL'
+    if c == '(':           return 'LPAREN'
+    if c == ')':           return 'RPAREN'
+    if c.isspace():        return 'SPACE'
+    return 'INVALID'
+
+# ------------------------------------------------------------------
+# Tabela de transições δ: (estado_atual, tipo_char) → próximo_estado
+# ------------------------------------------------------------------
+#   'EMIT' significa: finalizar o token atual e reprocessar o char
+# ------------------------------------------------------------------
+TRANSITION_TABLE = {
+    # Estado INICIO: ponto de partida e reset após cada token
+    ('INICIO',  'DIGIT'):   'NUM',
+    ('INICIO',  'ALPHA'):   'PALAVRA',
+    ('INICIO',  'OP'):      'OP_SINGLE',
+    ('INICIO',  'EQUAL'):   'EQUAL_SINGLE',
+    ('INICIO',  'LPAREN'):  'PAREN_SINGLE',
+    ('INICIO',  'RPAREN'):  'PAREN_SINGLE',
+    ('INICIO',  'SPACE'):   'INICIO',       # ignora espaços
+    ('INICIO',  'INVALID'): 'ERRO',
+
+    # Estado NUM: acumulando dígitos
+    ('NUM',     'DIGIT'):   'NUM',
+    ('NUM',     'ALPHA'):   'EMIT',         # ex: "10x" → emite NUM, reinicia
+    ('NUM',     'OP'):      'EMIT',
+    ('NUM',     'EQUAL'):   'EMIT',
+    ('NUM',     'LPAREN'):  'EMIT',
+    ('NUM',     'RPAREN'):  'EMIT',
+    ('NUM',     'SPACE'):   'EMIT',
+    ('NUM',     'INVALID'): 'ERRO',
+
+    # Estado PALAVRA: acumulando letras/dígitos (identificadores e keywords)
+    ('PALAVRA', 'ALPHA'):   'PALAVRA',
+    ('PALAVRA', 'DIGIT'):   'PALAVRA',
+    ('PALAVRA', 'OP'):      'EMIT',
+    ('PALAVRA', 'EQUAL'):   'EMIT',
+    ('PALAVRA', 'LPAREN'):  'EMIT',
+    ('PALAVRA', 'RPAREN'):  'EMIT',
+    ('PALAVRA', 'SPACE'):   'EMIT',
+    ('PALAVRA', 'INVALID'): 'ERRO',
+
+    # Estados de token único (OP, EQUAL, PAREN): sempre emitem imediatamente
+    ('OP_SINGLE',    'DIGIT'):   'EMIT',
+    ('OP_SINGLE',    'ALPHA'):   'EMIT',
+    ('OP_SINGLE',    'OP'):      'EMIT',
+    ('OP_SINGLE',    'EQUAL'):   'EMIT',
+    ('OP_SINGLE',    'LPAREN'):  'EMIT',
+    ('OP_SINGLE',    'RPAREN'):  'EMIT',
+    ('OP_SINGLE',    'SPACE'):   'EMIT',
+    ('OP_SINGLE',    'INVALID'): 'EMIT',
+
+    ('EQUAL_SINGLE', 'DIGIT'):   'EMIT',
+    ('EQUAL_SINGLE', 'ALPHA'):   'EMIT',
+    ('EQUAL_SINGLE', 'OP'):      'EMIT',
+    ('EQUAL_SINGLE', 'EQUAL'):   'EMIT',
+    ('EQUAL_SINGLE', 'LPAREN'):  'EMIT',
+    ('EQUAL_SINGLE', 'RPAREN'):  'EMIT',
+    ('EQUAL_SINGLE', 'SPACE'):   'EMIT',
+    ('EQUAL_SINGLE', 'INVALID'): 'EMIT',
+
+    ('PAREN_SINGLE', 'DIGIT'):   'EMIT',
+    ('PAREN_SINGLE', 'ALPHA'):   'EMIT',
+    ('PAREN_SINGLE', 'OP'):      'EMIT',
+    ('PAREN_SINGLE', 'EQUAL'):   'EMIT',
+    ('PAREN_SINGLE', 'LPAREN'):  'EMIT',
+    ('PAREN_SINGLE', 'RPAREN'):  'EMIT',
+    ('PAREN_SINGLE', 'SPACE'):   'EMIT',
+    ('PAREN_SINGLE', 'INVALID'): 'EMIT',
+}
+
+# Conjunto de estados de aceitação F
+ACCEPT_STATES = {'NUM', 'PALAVRA', 'OP_SINGLE', 'EQUAL_SINGLE', 'PAREN_SINGLE'}
+
+# Palavras-chave da linguagem
+KEYWORDS = {'var', 'print'}
+
+# ------------------------------------------------------------------
+# Função de classificação do lexema acumulado → tipo de token
+# ------------------------------------------------------------------
+def classify(state, lexeme):
+    if state == 'NUM':
+        return ('NUM', lexeme)
+    if state == 'PALAVRA':
+        if lexeme in KEYWORDS:
+            return (lexeme.upper(), lexeme)   # VAR ou PRINT
+        return ('ID', lexeme)
+    if state == 'OP_SINGLE':
+        names = {'+': 'PLUS', '-': 'MINUS', '*': 'MULT', '/': 'DIV'}
+        return (names[lexeme], lexeme)
+    if state == 'EQUAL_SINGLE':
+        return ('EQUAL', lexeme)
+    if state == 'PAREN_SINGLE':
+        return ('LPAREN' if lexeme == '(' else 'RPAREN', lexeme)
+    return None
+
+# ------------------------------------------------------------------
+# Máquina do AFD — percorre a entrada dirigida pela tabela δ
+# ------------------------------------------------------------------
 def lexer(code):
-    tokens = []
-    i = 0  # ponteiro para percorrer a string
+    tokens  = []
+    state   = 'INICIO'
+    lexeme  = ''
+    i       = 0
 
-    while i < len(code):
-        char = code[i]
+    while i <= len(code):
+        # Sentinela: ao fim da string, forçamos um SPACE para emitir o
+        # último token pendente (se houver) sem duplicar lógica.
+        c = code[i] if i < len(code) else ' '
+        ctype = char_type(c)
 
-        # Ignora espaços em branco
-        if char.isspace():
-            i += 1
-            continue
+        next_state = TRANSITION_TABLE.get((state, ctype))
 
-        # 🔹 Reconhecimento de números (estado NUM)
-        elif char.isdigit():
-            num = char
-            i += 1
-            while i < len(code) and code[i].isdigit():
-                num += code[i]
-                i += 1
-            tokens.append(("NUM", num))
+        if next_state is None:
+            raise Exception(f"Erro léxico: caractere inesperado '{c}'")
 
-        # 🔹 Reconhecimento de palavras (ID ou palavras-chave)
-        elif char.isalpha():
-            word = char
-            i += 1
-            while i < len(code) and code[i].isalnum():
-                word += code[i]
-                i += 1
+        if next_state == 'ERRO':
+            raise Exception(f"Erro léxico: '{c}' não pertence ao alfabeto da linguagem")
 
-            # Verifica se é palavra-chave
-            if word == "var":
-                tokens.append(("VAR", word))
-            elif word == "print":
-                tokens.append(("PRINT", word))
-            else:
-                tokens.append(("ID", word))  # identificador
-
-        # 🔹 Operadores e símbolos
-        elif char == "=":
-            tokens.append(("EQUAL", "="))
-            i += 1
-
-        elif char == "+":
-            tokens.append(("PLUS", "+"))
-            i += 1
-
-        elif char == "-":
-            tokens.append(("MINUS", "-"))
-            i += 1
-
-        elif char == "*":
-            tokens.append(("MULT", "*"))
-            i += 1
-
-        elif char == "/":
-            tokens.append(("DIV", "/"))
-            i += 1
-
-        elif char == "(":
-            tokens.append(("LPAREN", "("))
-            i += 1
-
-        elif char == ")":
-            tokens.append(("RPAREN", ")"))
-            i += 1
-
-        # 🔹 Erro léxico (símbolo não reconhecido)
+        if next_state == 'EMIT':
+            # Emite o token acumulado, reinicia e reprocessa o char atual
+            if state in ACCEPT_STATES and lexeme:
+                tok = classify(state, lexeme)
+                if tok:
+                    tokens.append(tok)
+            state  = 'INICIO'
+            lexeme = ''
+            # NÃO avança i — o char atual será reprocessado no próximo ciclo
         else:
-            raise Exception(f"Erro léxico: {char}")
+            # Transição normal: acumula o char e avança
+            if next_state != 'INICIO':
+                lexeme += c
+            state = next_state
+            i += 1
 
     return tokens
