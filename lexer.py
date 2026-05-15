@@ -135,7 +135,9 @@ def lexer(code):
         c = code[i] if i < len(code) else ' '
         ctype = char_type(c)
 
-        next_state = TRANSITION_TABLE.get((state, ctype))
+        next_state = TRANSITION_TABLE.get((state, ctype)),
+
+        print(f"[{state}] -- {c} --> [{next_state}]")
 
         if next_state is None:
             raise Exception(f"Erro léxico: caractere inesperado '{c}'")
