@@ -3,60 +3,76 @@
 # ============================================================
 #
 # O Autômato Finito Determinístico (AFD) é definido formalmente como:
+#
 #   M = (Q, Σ, δ, q0, F)
 #
-#   Q  = {INICIO, NUM, PALAVRA, OP, ERRO}
-#   Σ  = caracteres ASCII imprimíveis
-#   q0 = 'INICIO'
-#   F  = {NUM, PALAVRA, OP}          (estados de aceitação)
-#   δ  = dicionário TRANSITION_TABLE abaixo
+#   Q  = conjunto de estados
+#   Σ  = alfabeto de entrada
+#   δ  = função de transição
+#   q0 = estado inicial
+#   F  = conjunto de estados finais
 #
-# A cada caractere lido, o autômato consulta δ(estado_atual, tipo_char)
-# e avança para o próximo estado. Ao detectar uma transição de volta a
-# INICIO (fim de lexema), o token acumulado é classificado e emitido.
 # ============================================================
 
-# ------------------------------------------------------------------
-# Classificação de caracteres (categorias do alfabeto de entrada)
-# ------------------------------------------------------------------
+# ------------------------------------------------------------
+# Classificação dos caracteres do alfabeto
+# ------------------------------------------------------------
 def char_type(c):
-    if c.isdigit():        return 'DIGIT'
-    if c.isalpha():        return 'ALPHA'
-    if c == '_':           return 'ALPHA'   # underscore válido em identificadores
-    if c in '+-*/':        return 'OP'
-    if c == '=':           return 'EQUAL'
-    if c == '(':           return 'LPAREN'
-    if c == ')':           return 'RPAREN'
-    if c.isspace():        return 'SPACE'
+
+    if c.isdigit():
+        return 'DIGIT'
+
+    if c.isalpha():
+        return 'ALPHA'
+
+    if c == '_':
+        return 'ALPHA'
+
+    if c in '+-*/':
+        return 'OP'
+
+    if c == '=':
+        return 'EQUAL'
+
+    if c == '(':
+        return 'LPAREN'
+
+    if c == ')':
+        return 'RPAREN'
+
+    if c.isspace():
+        return 'SPACE'
+
     return 'INVALID'
 
-# ------------------------------------------------------------------
-# Tabela de transições δ: (estado_atual, tipo_char) → próximo_estado
-# ------------------------------------------------------------------
-#   'EMIT' significa: finalizar o token atual e reprocessar o char
-# ------------------------------------------------------------------
+
+# ------------------------------------------------------------
+# Tabela de transições δ
+# (estado_atual, tipo_char) → próximo_estado
+# ------------------------------------------------------------
 TRANSITION_TABLE = {
-    # Estado INICIO: ponto de partida e reset após cada token
-    ('INICIO',  'DIGIT'):   'NUM',
-    ('INICIO',  'ALPHA'):   'PALAVRA',
-    ('INICIO',  'OP'):      'OP_SINGLE',
-    ('INICIO',  'EQUAL'):   'EQUAL_SINGLE',
-    ('INICIO',  'LPAREN'):  'PAREN_SINGLE',
-    ('INICIO',  'RPAREN'):  'PAREN_SINGLE',
-    ('INICIO',  'SPACE'):   'INICIO',       # ignora espaços
-    ('INICIO',  'INVALID'): 'ERRO',
 
-    # Estado NUM: acumulando dígitos
-    ('NUM',     'DIGIT'):   'NUM',
-    ('NUM',     'ALPHA'):   'EMIT',         # ex: "10x" → emite NUM, reinicia
-    ('NUM',     'OP'):      'EMIT',
-    ('NUM',     'EQUAL'):   'EMIT',
-    ('NUM',     'LPAREN'):  'EMIT',
-    ('NUM',     'RPAREN'):  'EMIT',
-    ('NUM',     'SPACE'):   'EMIT',
-    ('NUM',     'INVALID'): 'ERRO',
+    # Estado inicial
+    ('INICIO', 'DIGIT'):   'NUM',
+    ('INICIO', 'ALPHA'):   'PALAVRA',
+    ('INICIO', 'OP'):      'OP_SINGLE',
+    ('INICIO', 'EQUAL'):   'EQUAL_SINGLE',
+    ('INICIO', 'LPAREN'):  'PAREN_SINGLE',
+    ('INICIO', 'RPAREN'):  'PAREN_SINGLE',
+    ('INICIO', 'SPACE'):   'INICIO',
+    ('INICIO', 'INVALID'): 'ERRO',
 
-    # Estado PALAVRA: acumulando letras/dígitos (identificadores e keywords)
+    # Estado NUM
+    ('NUM', 'DIGIT'):   'NUM',
+    ('NUM', 'ALPHA'):   'EMIT',
+    ('NUM', 'OP'):      'EMIT',
+    ('NUM', 'EQUAL'):   'EMIT',
+    ('NUM', 'LPAREN'):  'EMIT',
+    ('NUM', 'RPAREN'):  'EMIT',
+    ('NUM', 'SPACE'):   'EMIT',
+    ('NUM', 'INVALID'): 'ERRO',
+
+    # Estado PALAVRA
     ('PALAVRA', 'ALPHA'):   'PALAVRA',
     ('PALAVRA', 'DIGIT'):   'PALAVRA',
     ('PALAVRA', 'OP'):      'EMIT',
@@ -66,16 +82,17 @@ TRANSITION_TABLE = {
     ('PALAVRA', 'SPACE'):   'EMIT',
     ('PALAVRA', 'INVALID'): 'ERRO',
 
-    # Estados de token único (OP, EQUAL, PAREN): sempre emitem imediatamente
-    ('OP_SINGLE',    'DIGIT'):   'EMIT',
-    ('OP_SINGLE',    'ALPHA'):   'EMIT',
-    ('OP_SINGLE',    'OP'):      'EMIT',
-    ('OP_SINGLE',    'EQUAL'):   'EMIT',
-    ('OP_SINGLE',    'LPAREN'):  'EMIT',
-    ('OP_SINGLE',    'RPAREN'):  'EMIT',
-    ('OP_SINGLE',    'SPACE'):   'EMIT',
-    ('OP_SINGLE',    'INVALID'): 'EMIT',
+    # Operadores
+    ('OP_SINGLE', 'DIGIT'):   'EMIT',
+    ('OP_SINGLE', 'ALPHA'):   'EMIT',
+    ('OP_SINGLE', 'OP'):      'EMIT',
+    ('OP_SINGLE', 'EQUAL'):   'EMIT',
+    ('OP_SINGLE', 'LPAREN'):  'EMIT',
+    ('OP_SINGLE', 'RPAREN'):  'EMIT',
+    ('OP_SINGLE', 'SPACE'):   'EMIT',
+    ('OP_SINGLE', 'INVALID'): 'EMIT',
 
+    # Igual
     ('EQUAL_SINGLE', 'DIGIT'):   'EMIT',
     ('EQUAL_SINGLE', 'ALPHA'):   'EMIT',
     ('EQUAL_SINGLE', 'OP'):      'EMIT',
@@ -85,6 +102,7 @@ TRANSITION_TABLE = {
     ('EQUAL_SINGLE', 'SPACE'):   'EMIT',
     ('EQUAL_SINGLE', 'INVALID'): 'EMIT',
 
+    # Parênteses
     ('PAREN_SINGLE', 'DIGIT'):   'EMIT',
     ('PAREN_SINGLE', 'ALPHA'):   'EMIT',
     ('PAREN_SINGLE', 'OP'):      'EMIT',
@@ -95,70 +113,130 @@ TRANSITION_TABLE = {
     ('PAREN_SINGLE', 'INVALID'): 'EMIT',
 }
 
-# Conjunto de estados de aceitação F
-ACCEPT_STATES = {'NUM', 'PALAVRA', 'OP_SINGLE', 'EQUAL_SINGLE', 'PAREN_SINGLE'}
+# ------------------------------------------------------------
+# Estados finais F
+# ------------------------------------------------------------
+ACCEPT_STATES = {
+    'NUM',
+    'PALAVRA',
+    'OP_SINGLE',
+    'EQUAL_SINGLE',
+    'PAREN_SINGLE'
+}
 
+# ------------------------------------------------------------
 # Palavras-chave da linguagem
-KEYWORDS = {'var', 'print'}
+# ------------------------------------------------------------
+KEYWORDS = {
+    'var',
+    'print'
+}
 
-# ------------------------------------------------------------------
-# Função de classificação do lexema acumulado → tipo de token
-# ------------------------------------------------------------------
+
+# ------------------------------------------------------------
+# Classificação do token reconhecido
+# ------------------------------------------------------------
 def classify(state, lexeme):
+
     if state == 'NUM':
         return ('NUM', lexeme)
+
     if state == 'PALAVRA':
+
         if lexeme in KEYWORDS:
-            return (lexeme.upper(), lexeme)   # VAR ou PRINT
+            return (lexeme.upper(), lexeme)
+
         return ('ID', lexeme)
+
     if state == 'OP_SINGLE':
-        names = {'+': 'PLUS', '-': 'MINUS', '*': 'MULT', '/': 'DIV'}
+
+        names = {
+            '+': 'PLUS',
+            '-': 'MINUS',
+            '*': 'MULT',
+            '/': 'DIV'
+        }
+
         return (names[lexeme], lexeme)
+
     if state == 'EQUAL_SINGLE':
         return ('EQUAL', lexeme)
+
     if state == 'PAREN_SINGLE':
-        return ('LPAREN' if lexeme == '(' else 'RPAREN', lexeme)
+
+        if lexeme == '(':
+            return ('LPAREN', lexeme)
+
+        return ('RPAREN', lexeme)
+
     return None
 
-# ------------------------------------------------------------------
-# Máquina do AFD — percorre a entrada dirigida pela tabela δ
-# ------------------------------------------------------------------
-def lexer(code):
-    tokens  = []
-    state   = 'INICIO'
-    lexeme  = ''
-    i       = 0
+
+# ------------------------------------------------------------
+# Execução do AFD
+# ------------------------------------------------------------
+def lexer(code, debug=False):
+
+    tokens = []
+
+    state = 'INICIO'
+
+    lexeme = ''
+
+    i = 0
 
     while i <= len(code):
-        # Sentinela: ao fim da string, forçamos um SPACE para emitir o
-        # último token pendente (se houver) sem duplicar lógica.
+
+        # Sentinela de fim de entrada
         c = code[i] if i < len(code) else ' '
+
         ctype = char_type(c)
 
-        next_state = TRANSITION_TABLE.get((state, ctype)),
+        # Consulta δ
+        next_state = TRANSITION_TABLE.get((state, ctype))
 
-        print(f"[{state}] -- {c} --> [{next_state}]")
+        # Debug do autômato
+        if debug:
+            print(f"[{state}] -- '{c}' ({ctype}) --> [{next_state}]")
 
+        # Estado inválido
         if next_state is None:
-            raise Exception(f"Erro léxico: caractere inesperado '{c}'")
+            raise Exception(f"Caractere inesperado: '{c}'")
 
+        # Estado de erro
         if next_state == 'ERRO':
-            raise Exception(f"Erro léxico: '{c}' não pertence ao alfabeto da linguagem")
+            raise Exception(f"'{c}' não pertence ao alfabeto da linguagem")
 
+        # Emissão de token
         if next_state == 'EMIT':
-            # Emite o token acumulado, reinicia e reprocessa o char atual
+
             if state in ACCEPT_STATES and lexeme:
+
                 tok = classify(state, lexeme)
+
                 if tok:
+
                     tokens.append(tok)
-            state  = 'INICIO'
+
+                    if debug:
+                        print(f"  TOKEN EMITIDO: {tok}")
+
+            # Reinicia o autômato
+            state = 'INICIO'
+
             lexeme = ''
-            # NÃO avança i — o char atual será reprocessado no próximo ciclo
+
+            # NÃO avança o índice
+            continue
+
+        # Transição normal
         else:
-            # Transição normal: acumula o char e avança
+
             if next_state != 'INICIO':
                 lexeme += c
+
             state = next_state
+
             i += 1
 
     return tokens
