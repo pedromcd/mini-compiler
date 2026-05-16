@@ -1,0 +1,314 @@
+/* static/style.css */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #8ee4af,
+            #6fd3ff
+        );
+
+    color: #123;
+
+    padding: 40px;
+}
+
+.page {
+    max-width: 1400px;
+    margin: auto;
+}
+
+/* HERO */
+
+.hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.hero h1 {
+
+    font-size: 64px;
+
+    color: #0d2b52;
+
+    margin-bottom: 20px;
+}
+
+.hero p {
+
+    font-size: 24px;
+
+    max-width: 900px;
+
+    margin: auto;
+
+    line-height: 1.6;
+
+    color: #234;
+}
+
+/* GRID */
+
+.main-grid {
+
+    display: grid;
+
+    grid-template-columns: 2fr 1fr;
+
+    gap: 30px;
+
+    margin-bottom: 30px;
+}
+
+/* CARDS */
+
+.card {
+
+    background: rgba(255,255,255,0.92);
+
+    border-radius: 24px;
+
+    padding: 30px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+
+    color: #17995f;
+
+    margin-bottom: 10px;
+
+    font-size: 34px;
+}
+
+.subtitle {
+
+    color: #456;
+
+    margin-bottom: 25px;
+
+    font-size: 18px;
+}
+
+/* TEXTAREA */
+
+textarea {
+
+    width: 100%;
+
+    height: 220px;
+
+    resize: none;
+
+    border-radius: 18px;
+
+    border: 2px solid #cfe8df;
+
+    padding: 20px;
+
+    font-size: 22px;
+
+    outline: none;
+
+    margin-bottom: 25px;
+}
+
+textarea:focus {
+
+    border-color: #42cba3;
+}
+
+/* BOTÃO */
+
+button {
+
+    border: none;
+
+    background:
+        linear-gradient(
+            to right,
+            #47d7a7,
+            #4a8cff
+        );
+
+    color: white;
+
+    padding: 16px 34px;
+
+    border-radius: 14px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+button:hover {
+
+    transform: scale(1.03);
+}
+
+/* INFO */
+
+.info-card h2 {
+    margin-bottom: 25px;
+}
+
+.steps {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.step {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.step span {
+
+    min-width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #43c58f;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+.step p {
+
+    font-size: 18px;
+
+    line-height: 1.5;
+}
+
+/* TOKENS */
+
+.tokens-card table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+}
+
+.tokens-card th {
+
+    text-align: left;
+
+    padding: 16px;
+
+    color: #1a67c7;
+
+    border-bottom: 2px solid #42cba3;
+
+    font-size: 18px;
+}
+
+.tokens-card td {
+
+    padding: 18px;
+
+    border-bottom: 1px solid #dde;
+}
+
+.tokens-card tr:nth-child(even) {
+
+    background: #f4f8fb;
+}
+
+/* BADGES */
+
+.badge {
+
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border-radius: 10px;
+
+    background: #d9efff;
+
+    color: #1565c0;
+
+    font-weight: bold;
+}
+
+/* ERRO */
+
+.error {
+
+    margin-top: 25px;
+
+    background: #ffd9d9;
+
+    color: #c62828;
+
+    padding: 16px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+}
+
+/* VAZIO */
+
+.empty {
+
+    margin-top: 20px;
+
+    color: #456;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 1000px) {
+
+    .main-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+
+        font-size: 42px;
+    }
+
+    .hero p {
+
+        font-size: 18px;
+    }
+}

@@ -1,0 +1,157 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analisador Léxico com AFD</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="page">
+
+        <!-- TÍTULO -->
+        <header class="hero">
+
+            <h1>Analisador Léxico com AFD</h1>
+
+            <p>
+                Este analisador utiliza um
+                <strong>Autômato Finito Determinístico (AFD)</strong>
+                para reconhecer padrões léxicos e transformar
+                entradas em tokens.
+            </p>
+
+        </header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="main-grid">
+
+            <!-- BLOCO ESQUERDO -->
+            <section class="card">
+
+                <h2>Digite seu código</h2>
+
+                <p class="subtitle">
+                    Insira uma expressão para análise léxica.
+                </p>
+
+                <form method="POST">
+
+                    <textarea
+                        name="code"
+                        placeholder="Exemplo: var1 = 123 + abc"
+                    >{{ code }}</textarea>
+
+                    <button type="submit">
+                        Analisar
+                    </button>
+
+                </form>
+
+            </section>
+
+            <!-- BLOCO DIREITO -->
+            <section class="card info-card">
+
+                <h2>Como funciona?</h2>
+
+                <div class="steps">
+
+                    <div class="step">
+                        <span>1</span>
+                        <p>Você digita uma expressão.</p>
+                    </div>
+
+                    <div class="step">
+                        <span>2</span>
+                        <p>O AFD processa caractere por caractere.</p>
+                    </div>
+
+                    <div class="step">
+                        <span>3</span>
+                        <p>Os lexemas são reconhecidos.</p>
+                    </div>
+
+                    <div class="step">
+                        <span>4</span>
+                        <p>Os tokens são exibidos abaixo.</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- TOKENS -->
+        <section class="card tokens-card">
+
+            <h2>Tokens Reconhecidos</h2>
+
+            <p class="subtitle">
+                Lista de tokens gerados pela análise léxica.
+            </p>
+
+            {% if tokens %}
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Lexema</th>
+                            <th>Token</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for token in tokens %}
+
+                            <tr>
+
+                                <td>{{ token[1] }}</td>
+
+                                <td>
+                                    <span class="badge">
+                                        {{ token[0] }}
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <p class="empty">
+                    Nenhum token gerado ainda.
+                </p>
+
+            {% endif %}
+
+            {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</body>
+</html>
