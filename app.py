@@ -8,11 +8,19 @@ def index():
 
     tokens = []
     error = None
-    code = ""
 
     if request.method == 'POST':
 
         code = request.form['code']
+
+        if len(code) > 4000:
+            error = "Limite máximo de 4000 caracteres excedido."
+            return render_template(
+                'index.html',
+                tokens=[],
+                error=error,
+                code=code
+            )
 
         try:
             tokens = lexer(code)
@@ -23,8 +31,7 @@ def index():
     return render_template(
         'index.html',
         tokens=tokens,
-        error=error,
-        code=code
+        error=error
     )
 
 if __name__ == '__main__':
